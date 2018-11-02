@@ -1,0 +1,20 @@
+{
+  "name": "global-load-balancer",
+  "version": "0.1.0",
+  "description": "Simple Global Load Balancer example",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "Load",
+    "Balancer"
+  ],
+  "author": "cloud-oss@groups.homeawaycorp.com",
+  "license": "ISC",
+  "dependencies": {
+    "http-proxy": "^1.17.0",
+    "node-cache": "^4.2.0",
+    "request": "^2.88.0"
+  }
+}

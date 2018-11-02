@@ -1,0 +1,19 @@
+{
+  "name": "hello-cloud",
+  "version": "0.1.0",
+  "description": "hello world demo for Multicloud applications",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "Multi",
+    "Cloud",
+    "node.js"
+  ],
+  "author": "cloud-oss@groups.homeawaycorp.com",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}

@@ -1,0 +1,42 @@
+admin:
+  ip: 0.0.0.0
+  port: 9990
+
+namers:
+- kind: io.l5d.consul
+  includeTag: true
+  useHealthCheck: true
+  host: consul
+
+routers:
+- protocol: http
+  label: /http-consul
+  service:
+    responseClassifier:
+      kind: io.l5d.http.retryableIdempotent5XX
+  identifier:
+    - kind: io.l5d.header
+      header: X-Upstream-Service    
+    - kind: io.l5d.path
+      segments: 2
+      consume: true
+    - kind: io.l5d.path
+      segments: 1
+      consume: true
+    - kind: io.l5d.static
+      path: /hello-cloud-app
+  dtab: |
+    /svc => /#/io.l5d.consul/dc1;
+    /svc => /#/io.l5d.consul/dc1/live;
+  servers:
+  - port: 4140
+    ip: 0.0.0.0
+  client:
+   requeueBudget:
+     percentCanRetry: 5.0
+
+telemetry:
+- kind: io.l5d.prometheus
+
+usage:
+  orgId: linkerd-examples-consul

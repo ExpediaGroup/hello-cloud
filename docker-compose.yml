@@ -1,0 +1,100 @@
+version: '3'
+services:
+  consul:
+    image: "consul:latest"
+    ports:
+      - "8500:8500"
+
+  consul-registrator:
+    image: gliderlabs/registrator:v7
+    command: ['consul://consul:8500']
+    links:
+      - consul
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock
+    depends_on:
+      - consul
+
+  linkerd:
+    image: buoyantio/linkerd:1.4.6
+    command: ['/config.yaml']
+    links:
+      - consul
+    volumes:
+      - ./conf/linkerd.yml:/config.yaml
+    ports:
+      - 9990:9990
+      - 4140:4140
+    depends_on:
+      - consul-registrator
+
+  director:
+    image: mtyrrell/traffic-director-service:0.1.0-SNAPSHOT
+    ports:
+      - "8080:8080" # HTTP
+    environment:
+      - PORT=8080
+      - SERVICE_NAME=traffic-director
+      - SERVICE_8080_NAME=traffic-director
+
+  global-load-balancer:
+    build: ./global-load-balancer
+    ports:
+      - "9000:9000" # HTTP
+    environment:
+      - PORT=9000
+      - SERVICE_NAME=global-load-balancer
+      - SERVICE_9000_NAME=global-load-balancer
+    depends_on:
+      - linkerd
+      - director
+
+  hello-cloud-app:
+    build: ./hello-cloud-app
+    ports:
+      - "9001:9001" # HTTP
+    environment:
+      - PORT=9001
+      - SERVICE_NAME=hello-cloud-app
+      - SERVICE_9000_NAME=hello-cloud-app
+      - SERVICE_TAGS=v0.1.0,live
+
+  hello-cloud-service:
+    build: ./hello-cloud-app
+    ports:
+      - "9003:9003" # HTTP
+    environment:
+      - PORT=9003
+      - REGION=private
+      - SERVICE_NAME=hello-cloud-service
+      - SERVICE_9000_NAME=hello-cloud-service
+      - SERVICE_TAGS=private,live
+
+  hello-cloud-service-eu:
+    build: ./hello-cloud-app
+    ports:
+      - "9004:9004" # HTTP
+    environment:
+      - PORT=9004
+      - REGION=eu-west-1
+      - SERVICE_NAME=hello-cloud-service
+      - SERVICE_9000_NAME=hello-cloud-service
+      - SERVICE_TAGS=eu-west-1,live
+
+  hello-cloud-service-us:
+    build: ./hello-cloud-app
+    ports:
+      - "9002:9002" # HTTP
+    environment:
+      - PORT=9002
+      - REGION=us-east-1
+      - SERVICE_NAME=hello-cloud-service
+      - SERVICE_9000_NAME=hello-cloud-service
+      - SERVICE_TAGS=us-east-1,live
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+     - "9090:9090"
+    volumes:
+     - "./conf/prometheus.yml:/etc/prometheus/prometheus.yml"
