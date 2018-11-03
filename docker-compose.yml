@@ -29,7 +29,7 @@ services:
       - consul-registrator
 
   director:
-    image: mtyrrell/traffic-director-service:0.1.0-SNAPSHOT
+    image: homeaway/traffic-director-service:0.1.0-SNAPSHOT
     ports:
       - "8080:8080" # HTTP
     environment:
