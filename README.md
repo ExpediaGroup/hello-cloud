@@ -17,6 +17,8 @@ http://localhost:9000
 
 Oh no! A 404 page.
 
+We can navigate to an upstream application _routing-by-convention_ : http://localhost:9000/live/hello-cloud-app/hello
+
 Let's add a Route using [traffic-director](https://github.com/homeaway/traffic-director):
 
 ```
